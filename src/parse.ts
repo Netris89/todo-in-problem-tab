@@ -49,7 +49,7 @@ export class Parse
      * @param line The text line to parse.
      * @returns The content of the TODO/FIXME comment if found, otherwise an empty string.
      */
-    public parseLine(line: string): string
+    private parseLine(line: string): string
     {
         let uncommentedLine = line.replace(/^\/\/\s*/, '');
         let diagnosticToAdd = "";
