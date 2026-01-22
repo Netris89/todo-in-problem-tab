@@ -3,6 +3,7 @@
     "displayName": "TODO in Problem Tab",
     "publisher": "Netris",
     "description": "An extension to have TODO etc. comments in the problem tab",
+    "repository": {"url": "https://github.com/Netris89/todo-in-problem-tab"},
     "version": "0.0.1",
     "engines": {
         "vscode": "^1.108.1"
