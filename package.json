@@ -1,6 +1,7 @@
 {
     "name": "todo-in-problem-tab",
-    "displayName": "todo-in-problem-tab",
+    "displayName": "TODO in Problem Tab",
+    "publisher": "Netris",
     "description": "An extension to have TODO etc. comments in the problem tab",
     "version": "0.0.1",
     "engines": {
@@ -9,7 +10,7 @@
     "categories": [
         "Other"
     ],
-    "activationEvents": [],
+    "activationEvents": ["onStartupFinished"],
     "main": "./out/extension.js",
     "contributes": {
         "commands": [
