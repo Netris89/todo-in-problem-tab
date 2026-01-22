@@ -6,6 +6,8 @@ todo-in-problem-tab is a VSCode extension that move comments with various keywor
 
 This extension scans the opened document for comments with the various keywords (TODO & FIXME only at the moment). Each of those comments are then turned into a diagnostic and put them in the problem tab.
 
+![screenshot](screenshots/todo-in-problem-tab.png)
+
 ## Planned Feature
 
 This is only the first version and as such just has basic feature.   
