@@ -28,7 +28,8 @@ export class Parse
 
             if (readLine.startsWith("//"))
             {
-                const range = new vscode.Range(line, 0, line, readLine.length);
+                const startChar = document.lineAt(line).firstNonWhitespaceCharacterIndex;
+                const range = new vscode.Range(line, startChar, line, readLine.length + startChar);
                 
                 // Call parseLine to parse the line and determine if it has the right keyworkd
                 if (this.parseLine(readLine) !== "")
