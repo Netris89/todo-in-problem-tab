@@ -10,12 +10,12 @@ export class Parse
     }
 
     /**
-     * Parses the given document to find commented lines.
-     * For each line starting with "//", it calls parseLine to check
-     * if it contains a TODO or FIXME and converts it to a Diagnostic.
-     * 
+     * Parses the given document to find comment lines starting with "//".
+     * For each such line, it checks whether it starts with a configured keyword
+     * and converts matching comments into Diagnostics.
+     *
      * @param document The text document to parse.
-     * @returns An array of vscode.Diagnostic objects for the TODO/FIXME comments found.
+     * @returns An array of vscode.Diagnostic objects created from matching comments.
      */
     public parseDocument(document: vscode.TextDocument): vscode.Diagnostic[]
     {
@@ -30,8 +30,8 @@ export class Parse
             {
                 const startChar = document.lineAt(line).firstNonWhitespaceCharacterIndex;
                 const range = new vscode.Range(line, startChar, line, readLine.length + startChar);
-                
-                // Call parseLine to parse the line and determine if it has the right keyworkd
+
+                // Parse the comment line and check whether it matches a configured keyword
                 if (this.parseLine(readLine) !== "")
                 {
                     const diagnostic = new vscode.Diagnostic(range, this.parseLine(readLine), vscode.DiagnosticSeverity.Information);
@@ -44,19 +44,20 @@ export class Parse
     }
 
     /**
-     * Parses a single line of text to check if it contains a TODO or FIXME comment.
-     * Strips the leading '//' and any spaces before matching.
-     * 
-     * @param line The text line to parse.
-     * @returns The content of the TODO/FIXME comment if found, otherwise an empty string.
+     * Parses a single comment line to determine whether it starts with
+     * one of the configured keywords.
+     * Removes the leading '//' and any following whitespace before matching.
+     *
+     * @param line The comment line to parse (starting with "//").
+     * @returns The comment content if a matching keyword is found, otherwise an empty string.
      */
     private parseLine(line: string): string
     {
         let uncommentedLine = line.replace(/^\/\/\s*/, '');
         let diagnosticToAdd = "";
 
-        // Loops through each keywords (atm only TODO and FIXME) and compare them to the start of the parsed line.
-        // If it does, adds the line to the list of diagnostics.
+        // Check the comment content against each configured keyword.
+        // If a match is found, return the comment content.
         this.keywords.forEach(keyword =>
         {
             if (uncommentedLine.startsWith(keyword))
