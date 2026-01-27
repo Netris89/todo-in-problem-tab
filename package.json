@@ -3,21 +3,40 @@
     "displayName": "TODO in Problem Tab",
     "publisher": "Netris",
     "description": "An extension to have TODO etc. comments in the problem tab",
-    "repository": {"url": "https://github.com/Netris89/todo-in-problem-tab"},
-    "version": "0.0.1",
+    "repository": {
+        "url": "https://github.com/Netris89/todo-in-problem-tab"
+    },
+    "version": "0.0.2",
     "engines": {
         "vscode": "^1.108.1"
     },
     "categories": [
         "Other"
     ],
-    "activationEvents": ["onStartupFinished"],
+    "activationEvents": [
+        "onStartupFinished"
+    ],
     "main": "./out/extension.js",
     "contributes": {
-        "commands": [
+        "configuration": [
             {
-                "command": "todo-in-problem-tab.helloWorld",
-                "title": "Hello World"
+                "title": "todo-in-problem-tab",
+                "properties": {
+                    "todo-in-problem-tab.keywords": {
+                        "type": "array",
+                        "description": "List of keywords",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [
+                            "TODO",
+                            "FIXME",
+                            "BUG",
+                            "HACK"
+                        ],
+                        "markdownDescription": "The list of comment keywords (e.g. TODO, FIXME) that will be reported as problems."
+                    }
+                }
             }
         ]
     },

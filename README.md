@@ -8,13 +8,15 @@ This extension scans the opened document for comments with the various keywords 
 
 ![screenshot](screenshots/todo-in-problem-tab.png)
 
+A list of default keywords that you can extend to your liking.
+
+![options](screenshots/options.png)
+
 ## Planned Feature
 
 This is only the first version and as such just has basic feature.   
 Planned features are, in no specific order :
 
-- Add more keywords.
-- Add the possibility to add user-defined keywords.
 - Parse comments written on the same like as normal code (at the moment, only lines starting with // are parsed).
 - Add support for languages not using // for comments.
 
@@ -29,3 +31,7 @@ Below, you can find changelogs of the releases.
 ### 0.1
 
 Initial release of the extension.
+
+### 0.2
+
+Add support for user-defined keywords

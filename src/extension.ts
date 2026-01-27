@@ -12,7 +12,7 @@ export function activate(context: vscode.ExtensionContext)
     context.subscriptions.push(collection);
 
     // Define the keywords to look for and create a new Parse instance with them. Later, get keywords from user defined settings
-    let keywords = ["TODO", "FIXME"];
+    let keywords = vscode.workspace.getConfiguration("todo-in-problem-tab").get<string[]>("keywords", []);
     const parser = new Parse(keywords);
 
     // Parse active document
