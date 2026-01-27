@@ -4,9 +4,14 @@ One feature I liked with the Java Extension pack was that TODO were put in the p
 
 ## Features
 
-This extension scans the opened document for comments with the various keywords (TODO, FIXME, BUG & HACK by default.). Each of those comments are then turned into a diagnostic and put in the problem tab.
+This extension scans the opened document for comments with the various keywords (TODO, FIXME, BUG & HACK by default.). Each of those comments are then turned into a diagnostic and put in the problem tab.  
+Either on a separate line.
 
-![screenshot](screenshots/todo-in-problem-tab.png)
+![screenshot](screenshots/todo.png)
+
+Or the same line as code.
+
+![screenshot](screenshots/sameLine.png)
 
 Default keywords are provided but you can extend this list to your liking.
 
@@ -17,12 +22,11 @@ Default keywords are provided but you can extend this list to your liking.
 This is only the first version and as such just has basic feature.   
 Planned features are, in no specific order :
 
-- Parse comments written on the same like as normal code (at the moment, only lines starting with // are parsed).
 - Add support for languages not using // for comments.
 
 ## Known Issues
 
-Feel free to report any issue you find. Known issues will be listed here if there are any.
+The logic to determine if a comment is in a string litteral and should be ignored is fairly basic and thus prone to breaking. I'll get around to doing a more robust version in the future.
 
 ## Release Notes
 
@@ -34,4 +38,8 @@ Initial release of the extension.
 
 ### 0.2
 
-Add support for user-defined keywords
+Add support for user-defined keywords.
+
+### 0.3
+
+Add support for comments on the same line as code.

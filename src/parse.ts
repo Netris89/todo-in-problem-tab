@@ -24,11 +24,11 @@ export class Parse
         // Loops through the whole document to find comments
         for (let line = 0; line < document.lineCount; line++)
         {
-            let readLine = document.lineAt(line).text.trimStart();
+            const readLine = document.lineAt(line).text.trimStart();
+            const startChar = document.lineAt(line).firstNonWhitespaceCharacterIndex;
 
             if (readLine.startsWith("//"))
             {
-                const startChar = document.lineAt(line).firstNonWhitespaceCharacterIndex;
                 const range = new vscode.Range(line, startChar, line, readLine.length + startChar);
 
                 // Parse the comment line and check whether it matches a configured keyword
@@ -36,6 +36,27 @@ export class Parse
                 {
                     const diagnostic = new vscode.Diagnostic(range, this.parseLine(readLine), vscode.DiagnosticSeverity.Information);
                     diagnostics.push(diagnostic);
+                }
+            }
+            else
+            {
+                const index = readLine.lastIndexOf("//");
+                const newLine = readLine.slice(index).trim();
+
+                // lastIndexOf("//") returns -1 when no comment is present.
+                // In that case, the computed range would contain a negative character index,
+                // which is invalid for vscode.Range and causes an exception.
+                // This check ensures we only create a range when a comment actually exists.
+                if ((newLine.length + startChar + index) !== -1)
+                {
+                    const range = new vscode.Range(line, startChar + index, line, newLine.length + startChar + index);
+
+                    // Parse the comment line and check whether it matches a configured keyword
+                    if (this.parseLine(newLine) !== "")
+                    {
+                        const diagnostic = new vscode.Diagnostic(range, this.parseLine(newLine), vscode.DiagnosticSeverity.Information);
+                        diagnostics.push(diagnostic);
+                    }
                 }
             }
         }
@@ -53,18 +74,26 @@ export class Parse
      */
     private parseLine(line: string): string
     {
-        let uncommentedLine = line.replace(/^\/\/\s*/, '');
         let diagnosticToAdd = "";
 
-        // Check the comment content against each configured keyword.
-        // If a match is found, return the comment content.
-        this.keywords.forEach(keyword =>
+        // This is a deliberately simple logic to avoid parsing comments inside string literals.
+        // If a double quote appears before "//", the comment is assumed to be part of a string and ignored.
+        // This approach is not fully accurate (escaped quotes, multiple strings, template literals, etc.),
+        // but it is sufficient for a first iteration and avoids adding a full lexical parser.
+        if ((line.indexOf('"') < line.indexOf("//")))
         {
-            if (uncommentedLine.startsWith(keyword))
+            let uncommentedLine = line.replace(/^\/\/\s*/, '');
+
+            // Check the comment content against each configured keyword.
+            // If a match is found, return the comment content.
+            this.keywords.forEach(keyword =>
             {
-                diagnosticToAdd = uncommentedLine;
-            }
-        });
+                if (uncommentedLine.startsWith(keyword))
+                {
+                    diagnosticToAdd = uncommentedLine;
+                }
+            });
+        }
 
         return diagnosticToAdd;
     }
