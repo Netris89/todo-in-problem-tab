@@ -43,3 +43,7 @@ Add support for user-defined keywords.
 ### 0.3
 
 Add support for comments on the same line as code.
+
+## Get it
+
+You can download the extension directly from Github, [the VSCode marketplace](https://marketplace.visualstudio.com/items?itemName=netris.todo-in-problem-tab), [the Open VSX registry](https://open-vsx.org/extension/Netris/todo-in-problem-tab) or directly from VSCode
