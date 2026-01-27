@@ -47,7 +47,7 @@ export class Parse
                 // In that case, the computed range would contain a negative character index,
                 // which is invalid for vscode.Range and causes an exception.
                 // This check ensures we only create a range when a comment actually exists.
-                if ((newLine.length + startChar + index) !== -1)
+                if ((newLine.length + startChar + index) > 0)
                 {
                     const range = new vscode.Range(line, startChar + index, line, newLine.length + startChar + index);
 
