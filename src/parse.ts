@@ -77,11 +77,8 @@ export class Parse
     {
         let diagnosticToAdd = "";
 
-        // This is a deliberately simple logic to avoid parsing comments inside string literals.
-        // If a double quote appears before "//", the comment is assumed to be part of a string and ignored.
-        // This approach is not fully accurate (escaped quotes, multiple strings, template literals, etc.),
-        // but it is sufficient for a first iteration and avoids adding a full lexical parser.
-        if ((line.indexOf('"') < line.indexOf("//")))
+        // If the comment is inside a string litteral, ignores it
+        if (this.isCommentInsideString(line) === false)
         {
             let uncommentedLine = line.replace(/^\/\/\s*/, '');
 
@@ -98,5 +95,45 @@ export class Parse
         }
 
         return diagnosticToAdd;
+    }
+
+    /**
+     * Analyzes a line of code to determine whether a `//` comment appears
+     * inside a double-quoted string literal.
+     *
+     * The method scans the line character by character, keeping track of
+     * whether it is inside a string. It returns true if `//` is located
+     * within a string, otherwise false.
+     *
+     * @param line The line of code to analyze
+     * @returns `true` if `//` is inside a string literal, otherwise `false`
+     */
+    private isCommentInsideString(line: string): boolean
+    {
+        let code = false;
+        let openQuotePosition: number | undefined;
+        let closeQuotePosition: number | undefined;
+
+        for (let index = 0; index < line.length; index++)
+        {
+            if (line[index] === '"' && openQuotePosition === undefined)
+            {
+                openQuotePosition = index;
+            }
+            if (line[index] === '"' && openQuotePosition !== undefined)
+            {
+                closeQuotePosition = index;
+            }
+        }
+
+        if (openQuotePosition !== undefined && closeQuotePosition !== undefined)
+        {
+            if (line.indexOf("//") > openQuotePosition && line.indexOf("//") < closeQuotePosition)
+            {
+                code = true;
+            }
+        }
+
+        return code;
     }
 }
