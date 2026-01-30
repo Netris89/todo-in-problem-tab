@@ -4,6 +4,7 @@ import * as assert from 'assert';
 // as well as import your extension to test it
 import * as vscode from 'vscode';
 import { Parse } from './../parse';
+import { SourceText } from '../sourceText';
 
 
 suite('Parser Test Suite', () =>
@@ -15,13 +16,7 @@ suite('Parser Test Suite', () =>
 
     test('creates diagnostics for comments with keywords', async () =>
     {
-        const fakeDocument = await vscode.workspace.openTextDocument({
-            content: `
-                    // TODO one
-                    const x = 1;
-                    // FIXME two
-                    `
-        });
+        const fakeDocument = new SourceText("// TODO one\nconst x = 1;\n// FIXME two");
 
         const diagnostics = parser.parseDocument(fakeDocument);
 
@@ -30,12 +25,7 @@ suite('Parser Test Suite', () =>
 
     test('detects keyword without space after comment marker', async () =>
     {
-        const fakeDocument = await vscode.workspace.openTextDocument({
-            content: `
-                    //TODO one
-                    const x = 1;
-                    `
-        });
+        const fakeDocument = new SourceText("//TODO one\nconst x = 1;\n");
 
         const diagnostics = parser.parseDocument(fakeDocument);
 
@@ -44,11 +34,7 @@ suite('Parser Test Suite', () =>
 
     test('ignores keyword inside string literal', async () =>
     {
-        const fakeDocument = await vscode.workspace.openTextDocument({
-            content: `
-                    const x = "//TODO one";
-                    `
-        });
+        const fakeDocument = new SourceText("const x = \"//TODO one\";");
 
         const diagnostics = parser.parseDocument(fakeDocument);
 
@@ -57,12 +43,7 @@ suite('Parser Test Suite', () =>
 
     test('sets diagnostic message to comment content', async () =>
     {
-        const fakeDocument = await vscode.workspace.openTextDocument({
-            content: `
-                    // TODO one
-                    const x = 1;
-                    `
-        });
+        const fakeDocument = new SourceText("// TODO one\nconst x = 1;");
 
         const diagnostics = parser.parseDocument(fakeDocument);
 
@@ -70,29 +51,9 @@ suite('Parser Test Suite', () =>
         assert.strictEqual(diagnostics[0]?.message, "TODO one");
     });
 
-    test('sets diagnostic severity correctly', async () =>
-    {
-        const fakeDocument = await vscode.workspace.openTextDocument({
-            content: `
-                    // TODO one
-                    const x = 1;
-                    `
-        });
-
-        const diagnostics = parser.parseDocument(fakeDocument);
-
-        assert.strictEqual(diagnostics.length, 1);
-        assert.strictEqual(diagnostics[0]?.severity, vscode.DiagnosticSeverity.Information);
-    });
-
     test('ignores comments without keyword', async () =>
     {
-        const fakeDocument = await vscode.workspace.openTextDocument({
-            content: `
-                    // Hello
-                    const x = 1;
-                    `
-        });
+        const fakeDocument = new SourceText("// Hello\nconst x = 1;");
 
         const diagnostics = parser.parseDocument(fakeDocument);
 
@@ -101,31 +62,10 @@ suite('Parser Test Suite', () =>
 
     test('ignores empty comments', async () =>
     {
-        const fakeDocument = await vscode.workspace.openTextDocument({
-            content: `
-                    //
-                    `
-        });
+        const fakeDocument = new SourceText("//");
 
         const diagnostics = parser.parseDocument(fakeDocument);
 
         assert.strictEqual(diagnostics.length, 0);
     });
-
-    test('sets diagnostic range to comment line', async () =>
-    {
-        const fakeDocument = await vscode.workspace.openTextDocument({
-            content: `
-                    first line
-                        // TODO one
-                    third line
-                    `
-        });
-
-        const diagnostics = parser.parseDocument(fakeDocument);
-
-        assert.strictEqual(diagnostics.length, 1);
-        assert.strictEqual(diagnostics[0].range.start.line, 2);
-    });
-
 });

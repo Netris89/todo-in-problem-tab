@@ -4,6 +4,14 @@ All notable changes to the "todo-in-problem-tab" extension will be documented in
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## 0.1
 
-- Initial release
+- Initial release of the extension.
+
+## 0.2
+
+- Add support for user-defined keywords.
+
+## 0.3
+
+- Add support for comments on the same line as code.

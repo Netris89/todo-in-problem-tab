@@ -1,5 +1,19 @@
-import * as vscode from 'vscode';
+// import * as vscode from 'vscode';
+import { ParsedDiagnostic } from './parsedDiagnostic';
+import { SourceText } from './sourceText';
 
+/**
+ * Parses a VS Code text document to extract comment-based diagnostics.
+ *
+ * This class scans a `vscode.TextDocument` for line comments (`//`) and
+ * checks their content against a predefined list of keywords.
+ * When a matching keyword is found, an informational `vscode.Diagnostic`
+ * is created for the corresponding comment range.
+ *
+ * The parsing logic is intentionally lightweight and does not perform
+ * full lexical analysis; it aims to detect simple comment patterns
+ * without interpreting string literals or language grammar in depth.
+ */
 export class Parse
 {
     private keywords: string[];
@@ -17,46 +31,33 @@ export class Parse
      * @param document The text document to parse.
      * @returns An array of vscode.Diagnostic objects created from matching comments.
      */
-    public parseDocument(document: vscode.TextDocument): vscode.Diagnostic[]
+    public parseDocument(document: SourceText): ParsedDiagnostic[]
     {
-        let diagnostics: vscode.Diagnostic[] = [];
+        let diagnostics: ParsedDiagnostic[] = [];
 
         // Loops through the whole document to find comments
-        for (let line = 0; line < document.lineCount; line++)
+        for (let line = 0; line < document.lineCount(); line++)
         {
-            const readLine = document.lineAt(line).text.trimStart();
-            const startChar = document.lineAt(line).firstNonWhitespaceCharacterIndex;
+            const readLine = document.lineAt(line).trimStart();
+            const startChar = document.lineAt(line).search(/\S/);
 
-            if (readLine.startsWith("//"))
+            const index = readLine.lastIndexOf("//");
+            if (index !== -1)
             {
-                const range = new vscode.Range(line, startChar, line, readLine.length + startChar);
+                const parsedLine = this.parseLine(readLine);
 
                 // Parse the comment line and check whether it matches a configured keyword
-                if (this.parseLine(readLine) !== "")
+                if (parsedLine !== "")
                 {
-                    const diagnostic = new vscode.Diagnostic(range, this.parseLine(readLine), vscode.DiagnosticSeverity.Information);
+                    const diagnostic: ParsedDiagnostic = {
+                        startLine: line,
+                        startChar: startChar + index,
+                        endLine: line,
+                        endChar: readLine.length + startChar,
+                        message: parsedLine
+                    };
+
                     diagnostics.push(diagnostic);
-                }
-            }
-            else
-            {
-                const index = readLine.lastIndexOf("//");
-                const newLine = readLine.slice(index).trim();
-
-                // lastIndexOf("//") returns -1 when no comment is present.
-                // In that case, the computed range would contain a negative character index,
-                // which is invalid for vscode.Range and causes an exception.
-                // This check ensures we only create a range when a comment actually exists.
-                if ((newLine.length + startChar + index) > 0)
-                {
-                    const range = new vscode.Range(line, startChar + index, line, newLine.length + startChar + index);
-
-                    // Parse the comment line and check whether it matches a configured keyword
-                    if (this.parseLine(newLine) !== "")
-                    {
-                        const diagnostic = new vscode.Diagnostic(range, this.parseLine(newLine), vscode.DiagnosticSeverity.Information);
-                        diagnostics.push(diagnostic);
-                    }
                 }
             }
         }
@@ -88,9 +89,10 @@ export class Parse
             // If a match is found, return the comment content.
             this.keywords.forEach(keyword =>
             {
-                if (uncommentedLine.startsWith(keyword))
+                const keywordIndex = uncommentedLine.search(keyword);
+                if (keywordIndex !== -1)
                 {
-                    diagnosticToAdd = uncommentedLine;
+                    diagnosticToAdd = uncommentedLine.slice(keywordIndex);
                 }
             });
         }
