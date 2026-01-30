@@ -2,15 +2,11 @@ import * as assert from 'assert';
 
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
-import * as vscode from 'vscode';
 import { Parse } from './../parse';
 import { SourceText } from '../sourceText';
 
-
 suite('Parser Test Suite', () =>
 {
-    vscode.window.showInformationMessage('Start all tests.');
-
     let keywords = ["TODO", "FIXME"];
     const parser = new Parse(keywords);
 
@@ -35,6 +31,24 @@ suite('Parser Test Suite', () =>
     test('ignores keyword inside string literal', async () =>
     {
         const fakeDocument = new SourceText("const x = \"//TODO one\";");
+
+        const diagnostics = parser.parseDocument(fakeDocument);
+
+        assert.strictEqual(diagnostics.length, 0);
+    });
+
+    test('ignores keyword in concatenated strings', async () =>
+    {
+        const fakeDocument = new SourceText("const a = \"hello\" + \"world // not a comment\";");
+
+        const diagnostics = parser.parseDocument(fakeDocument);
+
+        assert.strictEqual(diagnostics.length, 0);
+    });
+
+    test('ignores keyword in string with escaped quotes', async () =>
+    {
+        const fakeDocument = new SourceText("const a = \"this is a \\\"quoted\\\" string // comment\";");
 
         const diagnostics = parser.parseDocument(fakeDocument);
 
