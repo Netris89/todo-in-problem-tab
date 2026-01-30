@@ -30,19 +30,7 @@ The logic to determine if a comment is in a string litteral and should be ignore
 
 ## Release Notes
 
-Below, you can find changelogs of the releases.
-
-### 0.1
-
-Initial release of the extension.
-
-### 0.2
-
-Add support for user-defined keywords.
-
-### 0.3
-
-Add support for comments on the same line as code.
+If you want to now what's new, go read the [changelog](https://github.com/Netris89/todo-in-problem-tab/blob/master/CHANGELOG.md)
 
 ## Get it
 
