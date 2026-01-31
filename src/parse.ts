@@ -1,4 +1,3 @@
-// import * as vscode from 'vscode';
 import { ParsedDiagnostic } from './parsedDiagnostic';
 import { SourceText } from './sourceText';
 
