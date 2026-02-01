@@ -19,9 +19,11 @@ export default [{
             format: ["camelCase", "PascalCase"],
         }],
 
+        "brace-style": ["error", "allman"],
+
         curly: "warn",
         eqeqeq: "warn",
         "no-throw-literal": "warn",
-        semi: "warn",
+        semi: "error",
     },
 }];
