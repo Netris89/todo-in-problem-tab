@@ -39,7 +39,7 @@ suite('Parser Test Suite', () =>
 
     test('ignores keyword in concatenated strings', async () =>
     {
-        const fakeDocument = new SourceText("const a = \"hello\" + \"world // not a comment\";");
+        const fakeDocument = new SourceText("const a = \"hello\" + \"world // TODO not a comment\";");
 
         const diagnostics = parser.parseDocument(fakeDocument);
 
@@ -48,7 +48,7 @@ suite('Parser Test Suite', () =>
 
     test('ignores keyword in string with escaped quotes', async () =>
     {
-        const fakeDocument = new SourceText("const a = \"this is a \\\"quoted\\\" string // comment\";");
+        const fakeDocument = new SourceText("const a = \"this is a \\\"quoted\\\" string // TODO comment\";");
 
         const diagnostics = parser.parseDocument(fakeDocument);
 
