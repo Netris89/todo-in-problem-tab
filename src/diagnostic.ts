@@ -9,7 +9,7 @@ import { Parse } from './parse';
  * with user-defined keywords, and provides methods to update or clear
  * diagnostics for documents.
  */
-export class Diagnostic
+export class DiagnosticManager
 {
     private collection: vscode.DiagnosticCollection;
     private keywords: string[];
@@ -29,22 +29,21 @@ export class Diagnostic
     }
 
     /**
-     * Builds a VS Code Diagnostic for a given range in a text document.
+     * Creates a VS Code Diagnostic from an explicit document range and message.
      *
      * @param startLine Zero-based start line of the diagnostic.
      * @param startChar Zero-based start character of the diagnostic.
      * @param endLine Zero-based end line of the diagnostic.
-     * @param lineLength Length of the line or range to cover from startChar.
+     * @param endChar Zero-based end character of the diagnostic.
      * @param text Message to display in the diagnostic.
-     * @returns A `vscode.Diagnostic` representing the given range and message,
-     *          with severity set to Information.
+     * @returns A `vscode.Diagnostic` with severity set to Information.
      *
      * @remarks
-     * The end character is calculated as `startChar + lineLength`.
-     * This function is meant to convert a parsed diagnostic position
-     * into a VS Code diagnostic object.
+     * This method assumes that all positional information (start/end line and character)
+     * has already been computed by the parser. It performs no validation or adjustment
+     * of the provided range.
      */
-    public build(startLine: number, startChar: number, endLine: number, endChar: number, lineLength: number, text: string): vscode.Diagnostic
+    private build(startLine: number, startChar: number, endLine: number, endChar: number, text: string): vscode.Diagnostic
     {
         const range = new vscode.Range(startLine, startChar, endLine, endChar);
         const diagnostic = new vscode.Diagnostic(range, text, vscode.DiagnosticSeverity.Information);
@@ -69,7 +68,7 @@ export class Diagnostic
 
         parsedDiagnostics.forEach(diagnostic =>
         {
-            const builtDiagnostic = this.build(diagnostic.startLine, diagnostic.startChar, diagnostic.endLine, diagnostic.endChar, diagnostic.endChar - diagnostic.startChar, diagnostic.message);
+            const builtDiagnostic = this.build(diagnostic.startLine, diagnostic.startChar, diagnostic.endLine, diagnostic.endChar, diagnostic.message);
             diagnostics.push(builtDiagnostic);
         });
 
