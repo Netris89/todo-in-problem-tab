@@ -20,7 +20,10 @@
             "label": "Package the extension",
             "type": "shell",
             "command": "vsce",
-            "args": ["package"]
+            "args": ["package"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
         }
 	]
 }
