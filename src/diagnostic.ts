@@ -12,20 +12,21 @@ import { Parse } from './parse';
 export class DiagnosticManager
 {
     private collection: vscode.DiagnosticCollection;
-    private keywords: string[];
     private parser: Parse;
 
     /**
-     * Initializes a new instance of the `Diagnostic` class.
+     * Initializes a new instance of the `DiagnosticManager` class.
      * 
-     * Creates a VS Code diagnostic collection, reads user-defined keywords,
-     * and initializes the parser for processing documents.
+     * Sets up a VS Code diagnostic collection and a parser for processing documents.
+     * The parser should already be configured with any relevant keywords.
+     *
+     * @param parser The parser instance used to analyze documents.
+     * @param collection The VS Code diagnostic collection to store diagnostics.
      */
-    constructor()
+    constructor(parser: Parse, collection: vscode.DiagnosticCollection)
     {
-        this.collection = vscode.languages.createDiagnosticCollection("diagnostics");
-        this.keywords = vscode.workspace.getConfiguration("todo-in-problem-tab").get<string[]>("keywords", []);
-        this.parser = new Parse(this.keywords);
+        this.collection = collection;
+        this.parser = parser;
     }
 
     /**
@@ -54,9 +55,8 @@ export class DiagnosticManager
     /**
      * Updates the diagnostics for a given text document.
      *
-     * Parses the document using the configured parser, converts the
-     * parsed diagnostics into VS Code `Diagnostic` objects, and updates
-     * the internal diagnostic collection for the document's URI.
+     * Converts diagnostics returned by the parser into VS Code `Diagnostic` objects
+     * and updates the internal diagnostic collection for the document's URI.
      *
      * @param document The VS Code text document to analyze and update diagnostics for.
      */

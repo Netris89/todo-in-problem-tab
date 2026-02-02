@@ -1,45 +1,59 @@
 import * as assert from 'assert';
 
 import * as vscode from 'vscode';
-import { build } from '../diagnostic';
+import { DiagnosticManager } from '../diagnostic';
+import { Parse } from '../parse';
 
 suite('Diagnostic Builder Test Suite', () =>
 {
-    test('computes end character from startChar and lineLength', () =>
+    test("adds diagnostics with correct messages, ranges and severity", () =>
     {
-        const diagnostic = build(0, 0, 0, 10, 10, "test");
+        const keywords = ["TODO", "FIXME"];
+        const parser = new Parse(keywords);
+        const collection = vscode.languages.createDiagnosticCollection("diagnostics");
+        const manager = new DiagnosticManager(parser, collection);
 
-        assert.strictEqual(diagnostic.range.end.character, 10);
+        const fakeDocument = {
+            getText: () => "// TODO: test\nconst x = 42;\n// FIXME: bug",
+            languageId: "typescript",
+            uri: vscode.Uri.parse("file:///test.ts")
+        } as vscode.TextDocument;
+
+        manager.updateDiagnostics(fakeDocument);
+
+        const diagnostics = collection.get(fakeDocument.uri) ?? [];
+        assert.strictEqual(diagnostics.length, 2);
+
+        assert.strictEqual(diagnostics[0].message, "TODO: test");
+        assert.strictEqual(diagnostics[0].severity, vscode.DiagnosticSeverity.Information);
+        assert.strictEqual(diagnostics[0].range.start.line, 0);
+        assert.strictEqual(diagnostics[0].range.start.character, 0);
+        assert.strictEqual(diagnostics[0].range.end.character, 13);
+
+        assert.strictEqual(diagnostics[1].message, "FIXME: bug");
+        assert.strictEqual(diagnostics[1].severity, vscode.DiagnosticSeverity.Information);
+        assert.strictEqual(diagnostics[1].range.start.line, 2);
+        assert.strictEqual(diagnostics[1].range.start.character, 0);
+        assert.strictEqual(diagnostics[0].range.end.character, 13);
     });
 
-    test('creates diagnostic with correct range', () =>
+    test("deletes diagnostics safely", () =>
     {
-        const diagnostic = build(0, 0, 0, 10, 10, "test");
+        const keywords = ["TODO"];
+        const parser = new Parse(keywords);
+        const collection = vscode.languages.createDiagnosticCollection("diagnostics");
+        const manager = new DiagnosticManager(parser, collection);
 
-        assert.strictEqual(diagnostic.range.start.line, 0);
-        assert.strictEqual(diagnostic.range.start.character, 0);
-        assert.strictEqual(diagnostic.range.end.line, 0);
-        assert.strictEqual(diagnostic.range.end.character, 10);
-    });
+        const fakeDocument = {
+            getText: () => "// TODO: test",
+            languageId: "typescript",
+            uri: vscode.Uri.parse("file:///test.ts")
+        } as vscode.TextDocument;
 
-    test('sets diagnostic message from provided text', () =>
-    {
-        const diagnostic = build(0, 0, 0, 0, 0, "test");
+        manager.updateDiagnostics(fakeDocument);
+        manager.deleteDiagnostics(fakeDocument);
 
-        assert.strictEqual(diagnostic.message, "test");
-    });
-
-    test('sets diagnostic severity to Information', () =>
-    {
-        const diagnostic = build(0, 0, 0, 0, 0, "test");
-
-        assert.strictEqual(diagnostic.severity, vscode.DiagnosticSeverity.Information);
-    });
-
-    test('handles zero lineLength correctly', () =>
-    {
-        const diagnostic = build(0, 0, 0, 0, 0, "test");
-
-        assert.strictEqual(diagnostic.range.end.character, 0);
+        const diagnostics = collection.get(fakeDocument.uri) ?? [];
+        assert.strictEqual(diagnostics.length, 0);
     });
 });
