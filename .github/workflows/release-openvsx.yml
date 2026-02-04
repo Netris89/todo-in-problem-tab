@@ -1,0 +1,23 @@
+name: Publish to Open VSX Registry
+
+on:
+  workflow_run:
+    workflows: ["Package"]
+    types:
+      - completed
+
+jobs:
+  publish-openvsx:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+      - uses: actions/download-artifact@v4
+        with:
+          name: vscode-extension-package
+          path: dist/
+      - run: npx ovsx publish dist/*.vsix
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
