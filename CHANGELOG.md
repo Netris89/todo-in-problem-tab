@@ -2,8 +2,6 @@
 
 All notable changes to the "todo-in-problem-tab" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
 ## 0.1
 
 - Initial release of the extension.
@@ -23,4 +21,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### 0.3.2
 
 - Refactor the whole extension to make it more easily testable and maintanable.
-- Rewrite the parser to make it more intelligent in detecting comments in string litterals
+- Rewrite the parser to make it more intelligent in detecting comments in string litterals.
+
+### 0.3.3
+
+- Add live keyword update so changes apply without restarting VS Code.

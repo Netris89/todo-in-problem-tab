@@ -10,9 +10,9 @@ import { Parse } from './parse';
 export function activate(context: vscode.ExtensionContext)
 {
     const collection = vscode.languages.createDiagnosticCollection("diagnostics");
-    const keywords = vscode.workspace.getConfiguration("todo-in-problem-tab").get<string[]>("keywords", []);
-    const parser = new Parse(keywords);
-    const manager = new DiagnosticManager(parser, collection);
+    let keywords = vscode.workspace.getConfiguration("todo-in-problem-tab").get<string[]>("keywords", []);
+    let parser = new Parse(keywords);
+    let manager = new DiagnosticManager(parser, collection);
 
     // Parse active document
     let document = vscode.window.activeTextEditor?.document;
@@ -38,10 +38,17 @@ export function activate(context: vscode.ExtensionContext)
     {
         if (event.affectsConfiguration("todo-in-problem-tab.keywords"))
         {
-            // TODO: Implement method to reload config
-            // TODO: Implement update diagnostics with new keywords
+            collection.clear();
+            keywords = vscode.workspace.getConfiguration("todo-in-problem-tab").get<string[]>("keywords", []);
+            parser = new Parse(keywords);
+            manager = new DiagnosticManager(parser, collection);
+
+            for (const document of vscode.workspace.textDocuments)
+            {
+                manager.updateDiagnostics(document);
+            }
         }
-    });
+    }, null, context.subscriptions);
 
     // Remove diagnostics of clased documents
     vscode.workspace.onDidCloseTextDocument(document =>
@@ -51,5 +58,5 @@ export function activate(context: vscode.ExtensionContext)
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() 
+export function deactivate()
 { }
