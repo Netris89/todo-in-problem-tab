@@ -26,7 +26,7 @@ Planned features are, in no specific order :
 
 ## Known Issues
 
-The logic to determine if a comment is in a string litteral and should be ignored is fairly basic and thus prone to breaking. I'll get around to doing a more robust version in the future.
+Known issues are listed here.
 
 ## Release Notes
 
