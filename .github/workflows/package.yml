@@ -18,7 +18,7 @@ jobs:
           node-version: 25.x
       - run: npm ci
       - run: npm run build --if-present
-      - run: npx vsce package
+      - run: npx @vscode/vsce package
       - uses: actions/upload-artifact@v4
         with:
           name: vscode-extension-package
