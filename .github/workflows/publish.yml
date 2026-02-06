@@ -1,0 +1,70 @@
+name: Publish
+
+on:
+  workflow_run:
+    workflows: ["Test"]
+    types:
+      - completed
+
+jobs:
+  package:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    uses: ./.github/workflows/package.yml
+
+  publish-marketplace:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 25.x
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: vscode-extension-package
+          path: dist/
+
+      - run: npx vsce publish dist/*.vsix --pat ${{ secrets.VSCE_PAT }}
+
+  publish-openvsx:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 25.x
+
+      - uses: actions/download-artifact@v6
+        with:
+          name: vscode-extension-package
+          path: dist/
+
+      - run: npx ovsx publish dist/*.vsix
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+
+  github-release:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: vscode-extension-package
+          path: dist/
+
+      - uses: actions/create-release@v1
+        id: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.workflow_run.head_sha }}
+          release_name: Release ${{ github.event.workflow_run.head_branch }}
+
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: dist/*.vsix
+          asset_name: todo-in-problem-tab${{github.ref_name}}.vsix
+          asset_content_type: application/vsix
