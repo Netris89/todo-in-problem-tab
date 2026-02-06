@@ -6,6 +6,9 @@ on:
     types:
       - completed
 
+permissions:
+  contents: write
+
 jobs:
   package:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -24,7 +27,7 @@ jobs:
           name: vscode-extension-package
           path: dist/
 
-      - run: npx vsce publish dist/*.vsix --pat ${{ secrets.VSCE_PAT }}
+      - run: npx @vscode/vsce publish --packagePath dist/*.vsix --pat ${{ secrets.VSCE_PAT }}
 
   publish-openvsx:
     needs: package
@@ -66,5 +69,5 @@ jobs:
         with:
           upload_url: ${{ steps.release.outputs.upload_url }}
           asset_path: dist/*.vsix
-          asset_name: todo-in-problem-tab${{github.ref_name}}.vsix
+          asset_name: todo-in-problem-tab-${{github.ref_name}}.vsix
           asset_content_type: application/vsix
