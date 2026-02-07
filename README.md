@@ -36,4 +36,4 @@ If you want to now what's new, go read the [changelog](https://github.com/Netris
 
 ## Get it
 
-You can download the extension directly from [Github](https://github.com/Netris89/todo-in-problem-tab), [the VSCode marketplace](https://marketplace.visualstudio.com/items?itemName=netris.todo-in-problem-tab), [the Open VSX registry](https://open-vsx.org/extension/Netris/todo-in-problem-tab) or directly from VSCode
+You can download the extension directly from [Github](https://github.com/Netris89/todo-in-problem-tab), [the VSCode marketplace](https://marketplace.visualstudio.com/items?itemName=netris.todo-in-problem-tab), [the Open VSX registry](https://open-vsx.org/extension/Netris/todo-in-problem-tab) or [directly from VSCode](vscode:extension/netris.todo-in-problem-tab)
