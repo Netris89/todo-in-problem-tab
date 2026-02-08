@@ -50,6 +50,9 @@ jobs:
     needs: package
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repositoru
+        uses: actions/checkout@v6
+        
       - name: Get version
         id: get_version
         run: |
