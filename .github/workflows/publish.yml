@@ -52,7 +52,7 @@ jobs:
     steps:
       - name: Checkout repositoru
         uses: actions/checkout@v6
-        
+
       - name: Get version
         id: get_version
         run: |
@@ -77,6 +77,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.release.outputs.upload_url }}
-          asset_path: dist/vscode-extension-package.vsix
+          asset_path: dist/todo-in-problem-tab-${{ steps.get_version.outputs.version }}.vsix
           asset_name: todo-in-problem-tab-${{ steps.get_version.outputs.version }}.vsix
           asset_content_type: application/vsix
