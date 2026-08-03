@@ -11,11 +11,11 @@ export function activate(context: vscode.ExtensionContext)
 {
     const collection = vscode.languages.createDiagnosticCollection("diagnostics");
     let keywords = vscode.workspace.getConfiguration("todo-in-problem-tab").get<string[]>("keywords", []);
-    let parser = new Parse(keywords);
+    let document = vscode.window.activeTextEditor?.document;
+    let parser = new Parse(keywords, document?.languageId ?? "");
     let manager = new DiagnosticManager(parser, collection);
 
     // Parse active document
-    let document = vscode.window.activeTextEditor?.document;
     if (document !== undefined)
     {
         manager.updateDiagnostics(document);
@@ -40,7 +40,7 @@ export function activate(context: vscode.ExtensionContext)
         {
             collection.clear();
             keywords = vscode.workspace.getConfiguration("todo-in-problem-tab").get<string[]>("keywords", []);
-            parser = new Parse(keywords);
+            parser = new Parse(keywords, document?.languageId ?? "");
             manager = new DiagnosticManager(parser, collection);
 
             for (const document of vscode.workspace.textDocuments)

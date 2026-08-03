@@ -8,7 +8,7 @@ import { SourceText } from '../sourceText';
 suite('Parser Test Suite', () =>
 {
     let keywords = ["TODO", "FIXME"];
-    const parser = new Parse(keywords);
+    const parser = new Parse(keywords,"");
 
     test('creates diagnostics for comments with keywords', async () =>
     {

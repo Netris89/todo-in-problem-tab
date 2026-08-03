@@ -16,10 +16,12 @@ import { SourceText } from './sourceText';
 export class Parse
 {
     private keywords: string[];
+    private commentSign: string;
 
-    constructor(keywords: string[])
+    constructor(keywords: string[], language: string)
     {
         this.keywords = keywords;
+        this.commentSign = this.getCommentSign(language);
     }
 
     /**
@@ -40,7 +42,7 @@ export class Parse
             const readLine = document.lineAt(line).trimStart();
             const startChar = document.lineAt(line).search(/\S/);
 
-            const index = readLine.lastIndexOf("//");
+            const index = readLine.lastIndexOf(this.commentSign);
             if (index !== -1)
             {
                 const parsedLine = this.parseLine(readLine);
@@ -134,5 +136,31 @@ export class Parse
         }
 
         return code;
+    }
+
+    /**
+     * Returns the line comment marker used in the specified programming language.
+     *
+     * This method maps a language identifier to its corresponding single-line
+     * comment syntax. Supported languages include:
+     * - "python" and "powershell" -> "#"
+     * - "sql" -> "--"
+     * All other languages default to "//".
+     *
+     * @param language The language identifier of the document.
+     * @returns The string used for line comments in the given language.
+     */
+    private getCommentSign(language: string): string
+    {
+        switch (language.toLowerCase())
+        {
+            case "python":
+            case "powershell":
+                return "#";
+            case "sql":
+                return "--";
+            default:
+                return "//";
+        }
     }
 }

@@ -9,7 +9,7 @@ suite('Diagnostic Builder Test Suite', () =>
     test("adds diagnostics with correct messages, ranges and severity", () =>
     {
         const keywords = ["TODO", "FIXME"];
-        const parser = new Parse(keywords);
+        const parser = new Parse(keywords,"");
         const collection = vscode.languages.createDiagnosticCollection("diagnostics");
         const manager = new DiagnosticManager(parser, collection);
 
@@ -40,7 +40,7 @@ suite('Diagnostic Builder Test Suite', () =>
     test("deletes diagnostics safely", () =>
     {
         const keywords = ["TODO"];
-        const parser = new Parse(keywords);
+        const parser = new Parse(keywords,"");
         const collection = vscode.languages.createDiagnosticCollection("diagnostics");
         const manager = new DiagnosticManager(parser, collection);
 
