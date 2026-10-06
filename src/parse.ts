@@ -87,7 +87,7 @@ export class Parse
             // If a match is found, return the comment content.
             this.keywords.forEach(keyword =>
             {
-                const keywordIndex = uncommentedLine.search(keyword);
+                const keywordIndex = uncommentedLine.indexOf(keyword);
                 if (keywordIndex !== -1)
                 {
                     diagnosticToAdd = uncommentedLine.slice(keywordIndex);
