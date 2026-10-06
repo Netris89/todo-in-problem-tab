@@ -24,13 +24,19 @@ export function activate(context: vscode.ExtensionContext)
     // Parse document if it changed
     vscode.workspace.onDidChangeTextDocument(event =>
     {
-        manager.updateDiagnostics(event.document);
+        if (document?.uri.scheme === "file")
+        {
+            manager.updateDiagnostics(event.document);
+        }
     }, null, context.subscriptions);
 
     // Parse newly opened documents
     vscode.workspace.onDidOpenTextDocument(document =>
     {
-        manager.updateDiagnostics(document);
+        if (document.uri.scheme === "file")
+        {
+            manager.updateDiagnostics(document);
+        }
     }, null, context.subscriptions);
 
     // Parse files again after changes in the keywords
