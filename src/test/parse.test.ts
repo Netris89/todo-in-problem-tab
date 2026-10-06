@@ -82,4 +82,33 @@ suite('Parser Test Suite', () =>
 
         assert.strictEqual(diagnostics.length, 0);
     });
+
+    test('reports comment start at the first // occurrence, not a // inside the comment text', async () =>
+    {
+        const fakeDocument = new SourceText("const x = 1; // see https://example.com TODO fix");
+
+        const diagnostics = parser.parseDocument(fakeDocument);
+
+        assert.strictEqual(diagnostics.length, 1);
+        assert.strictEqual(diagnostics[0]?.startChar, 13);
+    });
+
+    test('matches keywords containing regex special characters literally', async () =>
+    {
+        const regexKeywordParser = new Parse(["TODO(1)"], "");
+        const fakeDocument = new SourceText("// TODO(1) fix this later");
+
+        const diagnostics = regexKeywordParser.parseDocument(fakeDocument);
+
+        assert.strictEqual(diagnostics.length, 1);
+    });
+
+    test('does not mistake a quoted string inside the comment text for being inside a code string', async () =>
+    {
+        const fakeDocument = new SourceText('const a = "hello"; // TODO: rename "x" variable');
+
+        const diagnostics = parser.parseDocument(fakeDocument);
+
+        assert.strictEqual(diagnostics.length, 1);
+    });
 });
