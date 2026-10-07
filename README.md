@@ -19,10 +19,6 @@ Default keywords are provided but you can extend this list to your liking.
 
 ![options](screenshots/options.png)
 
-## Planned Feature
-
-- Add support for languages not using // for comments.
-
 ## Known Issues
 
 Known issues are listed here.
