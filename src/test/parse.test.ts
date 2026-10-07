@@ -111,4 +111,64 @@ suite('Parser Test Suite', () =>
 
         assert.strictEqual(diagnostics.length, 1);
     });
+
+    test('detects a comment using # as the sign when language is python', async () =>
+    {
+        const pythonParser = new Parse(["TODO"], "python");
+        const fakeDocument = new SourceText("x = 1  # TODO fix this");
+
+        const diagnostics = pythonParser.parseDocument(fakeDocument);
+
+        assert.strictEqual(diagnostics.length, 1);
+    });
+
+    test('detects a comment using # as the sign when language is powershell', async () =>
+    {
+        const powershellParser = new Parse(["TODO"], "powershell");
+        const fakeDocument = new SourceText("$x = 1  # TODO fix this");
+
+        const diagnostics = powershellParser.parseDocument(fakeDocument);
+
+        assert.strictEqual(diagnostics.length, 1);
+    });
+
+    test('detects a comment using -- as the sign when language is sql', async () =>
+    {
+        const sqlParser = new Parse(["TODO"], "sql");
+        const fakeDocument = new SourceText("SELECT 1 -- TODO fix this");
+
+        const diagnostics = sqlParser.parseDocument(fakeDocument);
+
+        assert.strictEqual(diagnostics.length, 1);
+    });
+
+    test('falls back to // for an unrecognized language', async () =>
+    {
+        const unknownParser = new Parse(["TODO"], "some-unknown-language");
+        const fakeDocument = new SourceText("const x = 1; // TODO fix this");
+
+        const diagnostics = unknownParser.parseDocument(fakeDocument);
+
+        assert.strictEqual(diagnostics.length, 1);
+    });
+
+    test('matches the language name case-insensitively', async () =>
+    {
+        const pythonParser = new Parse(["TODO"], "Python");
+        const fakeDocument = new SourceText("x = 1  # TODO fix this");
+
+        const diagnostics = pythonParser.parseDocument(fakeDocument);
+
+        assert.strictEqual(diagnostics.length, 1);
+    });
+
+    test('does not detect a // comment when language uses a different sign', async () =>
+    {
+        const pythonParser = new Parse(["TODO"], "python");
+        const fakeDocument = new SourceText("x = 1  // TODO fix this");
+
+        const diagnostics = pythonParser.parseDocument(fakeDocument);
+
+        assert.strictEqual(diagnostics.length, 0);
+    });
 });
