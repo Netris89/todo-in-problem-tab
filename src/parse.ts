@@ -99,39 +99,45 @@ export class Parse
     }
 
     /**
-     * Analyzes a line of code to determine whether a `//` comment appears
-     * inside a double-quoted string literal.
+     * Analyzes a line of code to determine whether the comment marker
+     * (`this.commentSign`) appears inside a double-quoted string literal.
      *
-     * The method scans the line character by character, keeping track of
-     * whether it is inside a string. It returns true if `//` is located
+     * The method scans the line character by character, toggling a flag
+     * each time it encounters a `"`, to track whether the current position
+     * is inside a string. It returns true if the comment marker is located
      * within a string, otherwise false.
      *
      * @param line The line of code to analyze
-     * @returns `true` if `//` is inside a string literal, otherwise `false`
+     * @returns `true` if the comment marker is inside a string literal, otherwise `false`
      */
     private isCommentInsideString(line: string): boolean
     {
         let code = false;
-        let openQuotePosition: number | undefined;
-        let closeQuotePosition: number | undefined;
+        let inString = false;
+
+        if (line.indexOf('"') < 0)
+        {
+            return code;
+        }
 
         for (let index = 0; index < line.length; index++)
         {
-            if (line[index] === '"' && openQuotePosition === undefined)
+            if (line[index] === '"')
             {
-                openQuotePosition = index;
+                if (inString === true)
+                {
+                    inString = false;
+                }
+                else
+                {
+                    inString = true;
+                }
             }
-            if (line[index] === '"' && openQuotePosition !== undefined)
-            {
-                closeQuotePosition = index;
-            }
-        }
 
-        if (openQuotePosition !== undefined && closeQuotePosition !== undefined)
-        {
-            if (line.indexOf("//") > openQuotePosition && line.indexOf("//") < closeQuotePosition)
+            if (index === line.indexOf(this.commentSign) && inString === true)
             {
                 code = true;
+                break;
             }
         }
 
