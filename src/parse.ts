@@ -71,9 +71,9 @@ export class Parse
     }
 
     /**
-     * Parses a single line to determine whether it contains
+     * Parses a single line to determine whether its comment contains
      * one of the configured keywords.
-     * Removes a leading '//' (if any) and any following whitespace before matching.
+     * Extracts the comment text located after the comment sign before matching.
      * Ignores the line if the comment sign is inside a string literal.
      *
      * @param line The line to parse (may contain code before the comment).
@@ -86,8 +86,8 @@ export class Parse
         // If the comment is inside a string litteral, ignores it
         if (this.isCommentInsideString(line) === false)
         {
-            // Strip a leading "//" and the whitespace after it. Does nothing if the line does not start with "//"
-            let uncommentedLine = line.replace(/^\/\/\s*/, ''); // TODO : make this return the true comment, not only sometimes
+            // Extract the comment text located after the comment sign
+            let uncommentedLine = this.getComment(line);
 
             // Check the comment content against each configured keyword.
             // If a match is found, return the comment content.
@@ -180,5 +180,25 @@ export class Parse
             default:
                 return "//";
         }
+    }
+
+    /**
+     * Extracts the comment text from a line.
+     *
+     * Returns everything located after the first occurrence of the comment
+     * sign, without the leading whitespace. Any code before the comment sign
+     * is discarded. The line is expected to contain the comment sign.
+     *
+     * @param line The line to extract the comment from.
+     * @returns The comment text, without the comment sign.
+     */
+    private getComment(line: string): string
+    {
+        let comment: string;
+
+        let commentSignIndex = line.indexOf(this.commentSign);
+        comment = line.slice(commentSignIndex + this.commentSign.length, line.length).trimStart();
+
+        return comment;
     }
 }
