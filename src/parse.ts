@@ -91,16 +91,17 @@ export class Parse
 
             // Check the comment content against each configured keyword.
             // If a match is found, return the comment content.
-            this.keywords.forEach(keyword =>
+            for (const keyword of this.keywords)
             {
                 const keywordIndex = uncommentedLine.indexOf(keyword);
 
-                // Keep the comment only if it starts with the keyword. If several keywords match, the last one in the list wins
+                // Keep the comment only if it starts with the keyword
                 if (keywordIndex === 0)
                 {
                     diagnosticToAdd = uncommentedLine.slice(keywordIndex);
+                    break;
                 }
-            });
+            }
         }
 
         return diagnosticToAdd;
