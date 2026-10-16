@@ -71,13 +71,13 @@ export class Parse
     }
 
     /**
-     * Parses a single line to determine whether its comment contains
+     * Parses a single line to determine whether its comment starts with
      * one of the configured keywords.
      * Extracts the comment text located after the comment sign before matching.
      * Ignores the line if the comment sign is inside a string literal.
      *
      * @param line The line to parse (may contain code before the comment).
-     * @returns The text from the matching keyword to the end of the line, otherwise an empty string.
+     * @returns The comment text if it starts with a matching keyword, otherwise an empty string.
      */
     private parseLine(line: string): string
     {
@@ -95,8 +95,8 @@ export class Parse
             {
                 const keywordIndex = uncommentedLine.indexOf(keyword);
 
-                // Keep the text from the keyword to the end of the line. If several keywords match, the last one in the list wins
-                if (keywordIndex !== -1)
+                // Keep the comment only if it starts with the keyword. If several keywords match, the last one in the list wins
+                if (keywordIndex === 0)
                 {
                     diagnosticToAdd = uncommentedLine.slice(keywordIndex);
                 }

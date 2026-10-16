@@ -89,8 +89,7 @@ suite('Parser Test Suite', () =>
 
         const diagnostics = parser.parseDocument(fakeDocument);
 
-        assert.strictEqual(diagnostics.length, 1);
-        assert.strictEqual(diagnostics[0]?.startChar, 13);
+        assert.strictEqual(diagnostics.length, 0);
     });
 
     test('matches keywords containing regex special characters literally', async () =>
