@@ -2,11 +2,12 @@ import { ParsedDiagnostic } from './parsedDiagnostic';
 import { SourceText } from './sourceText';
 
 /**
- * Parses a VS Code text document to extract comment-based diagnostics.
+ * Parses a text document to extract comment-based diagnostics.
  *
- * This class scans a `vscode.TextDocument` for line comments (`//`) and
- * checks their content against a predefined list of keywords.
- * When a matching keyword is found, an informational `vscode.Diagnostic`
+ * This class scans a `SourceText` for line comments (`//`, `#` or `--`
+ * depending on the language) and checks their content against a
+ * predefined list of keywords.
+ * When a matching keyword is found, a `ParsedDiagnostic`
  * is created for the corresponding comment range.
  *
  * The parsing logic is intentionally lightweight and does not perform
@@ -25,12 +26,12 @@ export class Parse
     }
 
     /**
-     * Parses the given document to find comment lines starting with "//".
-     * For each such line, it checks whether it starts with a configured keyword
-     * and converts matching comments into Diagnostics.
+     * Parses the given document to find lines containing a comment sign.
+     * For each such line, it checks whether it contains a configured keyword
+     * and converts matching comments into ParsedDiagnostics.
      *
      * @param document The text document to parse.
-     * @returns An array of vscode.Diagnostic objects created from matching comments.
+     * @returns An array of ParsedDiagnostic objects created from matching comments.
      */
     public parseDocument(document: SourceText): ParsedDiagnostic[]
     {
@@ -39,10 +40,13 @@ export class Parse
         // Loops through the whole document to find comments
         for (let line = 0; line < document.lineCount(); line++)
         {
+            // Remove leading whitespace so the line starts at its first visible character
             const readLine = document.lineAt(line).trimStart();
+            // Column of the first non-whitespace character in the original line (-1 if the line is blank). Used to convert indexes in readLine back to document columns
             const startChar = document.lineAt(line).search(/\S/);
 
-            const index = readLine.lastIndexOf(this.commentSign);
+            // Index of the last occurrence of the comment sign in the trimmed line, or -1 if the line has no comment
+            const index = readLine.indexOf(this.commentSign);
             if (index !== -1)
             {
                 const parsedLine = this.parseLine(readLine);
@@ -52,9 +56,9 @@ export class Parse
                 {
                     const diagnostic: ParsedDiagnostic = {
                         startLine: line,
-                        startChar: startChar + index,
+                        startChar: startChar + index, // Index in the trimmed line converted back to a column in the original line
                         endLine: line,
-                        endChar: readLine.length + startChar,
+                        endChar: readLine.length + startChar, // The range extends to the end of the line
                         message: parsedLine
                     };
 
@@ -67,12 +71,13 @@ export class Parse
     }
 
     /**
-     * Parses a single comment line to determine whether it starts with
+     * Parses a single line to determine whether it contains
      * one of the configured keywords.
-     * Removes the leading '//' and any following whitespace before matching.
+     * Removes a leading '//' (if any) and any following whitespace before matching.
+     * Ignores the line if the comment sign is inside a string literal.
      *
-     * @param line The comment line to parse (starting with "//").
-     * @returns The comment content if a matching keyword is found, otherwise an empty string.
+     * @param line The line to parse (may contain code before the comment).
+     * @returns The text from the matching keyword to the end of the line, otherwise an empty string.
      */
     private parseLine(line: string): string
     {
@@ -81,13 +86,16 @@ export class Parse
         // If the comment is inside a string litteral, ignores it
         if (this.isCommentInsideString(line) === false)
         {
-            let uncommentedLine = line.replace(/^\/\/\s*/, '');
+            // Strip a leading "//" and the whitespace after it. Does nothing if the line does not start with "//"
+            let uncommentedLine = line.replace(/^\/\/\s*/, ''); // TODO : make this return the true comment, not only sometimes
 
             // Check the comment content against each configured keyword.
             // If a match is found, return the comment content.
             this.keywords.forEach(keyword =>
             {
                 const keywordIndex = uncommentedLine.indexOf(keyword);
+
+                // Keep the text from the keyword to the end of the line. If several keywords match, the last one in the list wins
                 if (keywordIndex !== -1)
                 {
                     diagnosticToAdd = uncommentedLine.slice(keywordIndex);
@@ -115,11 +123,13 @@ export class Parse
         let code = false;
         let inString = false;
 
+        // No quote on the line, so the comment sign cannot be inside a string
         if (line.indexOf('"') < 0)
         {
             return code;
         }
 
+        // inString flips at every quote: true between an opening and a closing quote
         for (let index = 0; index < line.length; index++)
         {
             if (line[index] === '"')
@@ -134,6 +144,7 @@ export class Parse
                 }
             }
 
+            // At the first occurrence of the comment sign, check whether we are currently inside a string. Escaped quotes are not handled
             if (index === line.indexOf(this.commentSign) && inString === true)
             {
                 code = true;
@@ -158,6 +169,7 @@ export class Parse
      */
     private getCommentSign(language: string): string
     {
+        // Languages sharing the same comment sign are grouped. The default case covers C-like languages
         switch (language.toLowerCase())
         {
             case "python":
