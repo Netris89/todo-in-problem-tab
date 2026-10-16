@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.7
 
-- Ignore non-file scheme documents (git, diff) in diagnostics.
+- Keywords containing special characters (such as parentheses or +) are now matched correctly.
+- Comments are no longer wrongly ignored when quotes appear elsewhere on the line.
+- Only comments starting with a keyword are now reported.
+- Documents that are not real files (git, diff) are no longer analyzed, which removes duplicate diagnostics.
 
 ## 0.6
 
